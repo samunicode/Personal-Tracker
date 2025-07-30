@@ -407,9 +407,9 @@ const generateMonthsData = (): MonthData[] => {
 // 
 // becomes:
 //
-// const { month: currentMonth, week: currentWeek } = getCurrentMonthAndWeek()
-// const [selectedMonth, setSelectedMonth] = useState<string>(currentMonth)
-// const [selectedWeek, setSelectedWeek] = useState<string>(currentWeek)
+// const { month: detectedMonth, week: detectedWeek } = getCurrentMonthAndWeek()
+// const [selectedMonth, setSelectedMonth] = useState<string>(detectedMonth)
+// const [selectedWeek, setSelectedWeek] = useState<string>(detectedWeek)
 
 // 4. Optional: Add a "Go to Today" button in your header actions:
 // const goToToday = useCallback(() => {
@@ -428,6 +428,7 @@ const generateMonthsData = (): MonthData[] => {
 //   <Calendar className="h-4 w-4" />
 //   Today
 // </Button>
+
 
 export default function ProductivityTracker() {
   const [gistConfig, setGistConfig] = useState({
@@ -474,9 +475,9 @@ export default function ProductivityTracker() {
   }>({})
 
   const [selectedTodo, setSelectedTodo] = useState<TodoItem | null>(null)
-  const { month: currentMonth, week: currentWeek } = getCurrentMonthAndWeek()
-  const [selectedMonth, setSelectedMonth] = useState<string>(currentMonth)
-  const [selectedWeek, setSelectedWeek] = useState<string>(currentWeek)
+  const { month: detectedMonth, week: detectedWeek } = getCurrentMonthAndWeek()
+const [selectedMonth, setSelectedMonth] = useState<string>(detectedMonth)
+const [selectedWeek, setSelectedWeek] = useState<string>(detectedWeek)
   const [isEditPanelOpen, setIsEditPanelOpen] = useState(false)
 
   // Debounce config changes to reduce re-renders
