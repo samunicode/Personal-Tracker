@@ -313,12 +313,44 @@ const DayCard = memo(
 
 DayCard.displayName = "DayCard"
 
+
+// Auto date detection helper functions
+const getCurrentMonthAndWeek = () => {
+  const now = new Date()
+  const currentMonth = now.getMonth() // 0-11 (0 = January)
+  const currentDay = now.getDate()
+  
+  // Map month numbers to our month names (7 = August, 8 = September, etc.)
+  const monthMap: { [key: number]: string } = {
+    7: "august",      // August
+    8: "september",   // September
+    9: "october",     // October
+    10: "november",   // November
+    11: "december"    // December
+  }
+  
+  const monthName = monthMap[currentMonth]
+  
+  // If current month is not in our range, default to August
+  if (!monthName) {
+    return { month: "august", week: "0-week-1" }
+  }
+  
+  // Calculate which week of the month we're in (rough estimate)
+  const weekOfMonth = Math.ceil(currentDay / 7)
+  const weekId = `${currentMonth - 7}-week-${weekOfMonth}` // Adjust index for our array
+  
+  return { month: monthName, week: weekId }
+}
+
+// Updated generateMonthsData function to include August through December
 const generateMonthsData = (): MonthData[] => {
   const months = [
-    { name: "July", days: 31, startDay: 1 },
     { name: "August", days: 31, startDay: 4 },
     { name: "September", days: 30, startDay: 0 },
     { name: "October", days: 31, startDay: 2 },
+    { name: "November", days: 30, startDay: 5 },
+    { name: "December", days: 31, startDay: 0 },
   ]
 
   return months.map((month, monthIndex) => {
@@ -354,6 +386,48 @@ const generateMonthsData = (): MonthData[] => {
     }
   })
 }
+
+// Additional changes needed in your main component:
+
+// Additional changes needed in your main component:
+
+// 1. Update the header description from:
+// <p className="text-muted-foreground">Track your tasks and progress across July - October</p>
+// to:
+// <p className="text-muted-foreground">Track your tasks and progress across August - December</p>
+
+// 2. Update the TabsList grid from:
+// <TabsList className="grid w-full grid-cols-4 h-14 bg-transparent p-1 rounded-none">
+// to:
+// <TabsList className="grid w-full grid-cols-5 h-14 bg-transparent p-1 rounded-none">
+
+// 3. Replace the initial state declarations with auto-detected values:
+// const [selectedMonth, setSelectedMonth] = useState<string>("august")
+// const [selectedWeek, setSelectedWeek] = useState<string>("")
+// 
+// becomes:
+//
+// const { month: currentMonth, week: currentWeek } = getCurrentMonthAndWeek()
+// const [selectedMonth, setSelectedMonth] = useState<string>(currentMonth)
+// const [selectedWeek, setSelectedWeek] = useState<string>(currentWeek)
+
+// 4. Optional: Add a "Go to Today" button in your header actions:
+// const goToToday = useCallback(() => {
+//   const { month, week } = getCurrentMonthAndWeek()
+//   setSelectedMonth(month)
+//   setSelectedWeek(week)
+// }, [])
+//
+// Then add this button in your header:
+// <Button
+//   onClick={goToToday}
+//   variant="outline"
+//   size="sm"
+//   className="flex items-center gap-2 rounded-xl px-4 py-2 h-10 text-primary border-primary/30 hover:border-primary/50 hover:bg-primary/10"
+// >
+//   <Calendar className="h-4 w-4" />
+//   Today
+// </Button>
 
 export default function ProductivityTracker() {
   const [gistConfig, setGistConfig] = useState({
@@ -400,8 +474,9 @@ export default function ProductivityTracker() {
   }>({})
 
   const [selectedTodo, setSelectedTodo] = useState<TodoItem | null>(null)
-  const [selectedMonth, setSelectedMonth] = useState<string>("july")
-  const [selectedWeek, setSelectedWeek] = useState<string>("")
+  const { month: currentMonth, week: currentWeek } = getCurrentMonthAndWeek()
+  const [selectedMonth, setSelectedMonth] = useState<string>(currentMonth)
+  const [selectedWeek, setSelectedWeek] = useState<string>(currentWeek)
   const [isEditPanelOpen, setIsEditPanelOpen] = useState(false)
 
   // Debounce config changes to reduce re-renders
@@ -976,7 +1051,7 @@ export default function ProductivityTracker() {
         <div className="bg-card rounded-2xl shadow-lg border border-border overflow-hidden enhanced-card">
           <Tabs value={selectedMonth} onValueChange={setSelectedMonth} className="w-full">
             <div className="border-b border-border bg-muted/30">
-              <TabsList className="grid w-full grid-cols-4 h-14 bg-transparent p-1 rounded-none">
+              <TabsList className="grid w-full grid-cols-5 h-14 bg-transparent p-1 rounded-none">
                 {monthsData.map((month) => (
                   <TabsTrigger
                     key={month.id}
